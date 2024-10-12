@@ -1,1 +1,4 @@
-# The python dependencies for Django/Stripe/PostgreSQL
+asgiref==3.8.1
+Django==4.2.16
+pillow==10.4.0
+sqlparse==0.5.1

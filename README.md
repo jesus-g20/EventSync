@@ -9,3 +9,29 @@ app also offers a map view feature to help users easily find nearby events.
 
 By integrating all these features into one app, EventSync makes it easier for people to organize,
 find, and attend events, while promotion social connections
+
+Pasos para poder ver el website y manajar la parte administrativa:
+
+1 - crear un virtual enviroment:
+
+python3 -m venv virtualenv
+
+2 - actival el virtual enviroment:
+
+source virtualenv/bin/activate
+
+3 - instalar dependencias(requirements.txt):
+
+pip install -r requirements.txt
+
+4 - correr las migrations:
+
+python manage.py migrate
+
+5 - crear el superadmin:
+
+python manage.py createsuperuser 
+
+6 - correr el servidor:
+
+python manage.py runserver
