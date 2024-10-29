@@ -1,0 +1,67 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-5 gap-6">
+    <div class="col-span-3 rounded-t-xl w-full overflow-hidden" style="height: 400px;">
+        {% if event.image %}
+        <img src="{{ event.image.url }}" class="object-cover h-full w-full rounded-t-xl" alt="{{ event.name }}">
+        {% else %}
+        <div class="flex items-center justify-center h-full w-full bg-gray-100 rounded-t-xl rounded-xl">
+            <img src="{% static 'images/default_image.jpeg' %}" class="h-3/4 w-3/4 object-contain" alt="Default Event Image">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-span-2 p-6 bg-gray-100 rounded-xl">
+        <h1 class="mb-6 text-3xl">{{ event.name }}</h1>
+        <p class="text-gray-500"><strong>Price: </strong>{{ event.price }}</p>
+        <p class="text-gray-500"><strong>Seller: </strong>{{ event.created_by.username }}</p>
+
+        {% if event.description %}
+        <p class="text-gray-700">
+            <strong class="text-gray-500">Description:</strong><br>
+            {{ event.description }}
+        </p>
+        {% endif %}
+
+        {% if request.user == event.created_by %}
+        <div class="mt-6 p-6 bg-white rounded-xl">
+            <p>This is your event!</p>
+
+            <a href="{% url 'event:edit_event' event.id %}" class="inline-block mt-6 px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl">Edit</a>
+            <a href="{% url 'event:delete_event' event.id %}" class="inline-block mt-6 px-6 py-3 text-lg font-semibold bg-red-500 text-white rounded-xl">Delete</a>
+        </div>
+        {% else %}
+        <a href="{% url 'chat:new_chat' event.id %}" class="inline-block mt-6 px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl hover:bg-teal-700">Contact seller</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
+    <h2 class="mb-12 text-2xl text-center">Related event</h2>
+
+    <div class="grid grid-cols-3 gap-3">
+        {% for event in related_event %}
+        <div>
+            <a href="{% url 'event:detail' event.id %}">
+                <div class="col-span-3 rounded-t-xl w-full overflow-hidden" style="height: 400px;">
+                    {% if event.image %}
+                    <img src="{{ event.image.url }}" class="object-cover h-full rounded-t-xl" alt="{{ event.name }}">
+                    {% else %}
+                    <img src="{% static 'images/default_image.jpeg' %}" class="m-50 object-cover h-full rounded-t-xl" alt="Default Event Image">
+                    {% endif %}
+                </div>
+
+                <div class="p-6 bg-white rounded-b-xl">
+                    <h2 class="text-2xl">{{ event.name }}</h2>
+                    <p class="text-gray-500">Price: {{ event.price }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Welcome {% endblock title %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative text-center bg-sky-600 text-white h-[calc(70vh-100px)]">
+    <!-- Background Image -->
+    <img src="{% static 'images/party.jpg' %}" alt="Party Event" class="absolute top-0 left-0 w-full h-full object-cover object-center opacity-50 z-0">
+
+    <!-- Content on Top of the Image -->
+    <div class="relative z-10 flex flex-col items-center justify-center h-full">
+        <h1 class="text-5xl font-bold mb-4">Discover & Create Events With Ease</h1>
+        <p class="text-lg mb-6">Find local events, connect with people, or host your own in just a few clicks.</p>
+
+        <!-- Button -->
+
+        <div class="flex space-x-4">
+            <a href="{% url 'main:registration' %}" class=" bg-white font-bold text-sky-600 px-8 py-3 rounded-md shadow-md hover:bg-sky-100">Join Now</a>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-16 px-16">
+    <div class="container mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-6">What is EventSync?</h2>
+        <p class="text-lg mb-4 text-sky-600">EventSync is your one-stop platform for discovering exciting events around you and hosting your own. Whether you're looking to attend a concert, a workshop, or a networking event, we make it easy to find and join events that match your interests.</p>
+        <p class="text-lg text-sky-600">Want to host? We've got you covered! Create and promote your event with just a few clicks, and watch the crowd grow.</p>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 px-16 bg-sky-100">
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <!-- Feature 1 -->
+        <div class="p-8 bg-white shadow-md rounded-lg">
+            <h3 class="text-2xl font-bold mb-4">Find Local Events</h3>
+            <p class="text-sky-600">Search through a wide range of events in your area and never miss out on the fun.</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="p-8 bg-white shadow-md rounded-lg">
+            <h3 class="text-2xl font-bold mb-4">Host Your Own</h3>
+            <p class="text-sky-600">Easily create and promote your event to attract attendees with a few clicks.</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="p-8 bg-white shadow-md rounded-lg">
+            <h3 class="text-2xl font-bold mb-4">Connect with People</h3>
+            <p class="text-sky-600">Join a community of event-goers and connect with people who share your interests.</p>
+        </div>
+    </div>
+</section>
+{% endblock content %}

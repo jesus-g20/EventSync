@@ -1,0 +1,56 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Browse Events{% endblock %}
+
+{% block content %}
+<div class="pb-6 grid grid-cols-4 gap-4 bg-sky-50">
+    <!-- Sidebar with search and categories -->
+    <div class="col-span-1">
+        <form method="get" action="{% url 'event:browse_events' %}">
+            <input name="query" class="w-full py-4 px-6 border rounded-xl" type="text" value="{{ query }}" placeholder="Search events...">
+            <button class="mt-2 py-4 px-8 text-lg bg-teal-500 text-white rounded-xl">Search</button>
+        </form>
+
+        <hr class="my-6">
+
+        <p class="font-semibold">Categories</p>
+        <ul>
+            {% for category in categories %}
+            <li class="py-2 px-2 rounded-xl{% if category.id == category_id %} bg-gray-200{% endif %}">
+                <a href="{% url 'event:browse_events' %}?query={{ query }}&category={{ category.id }}">{{ category.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <hr class="my-6">
+        <p class="font-semibold">Clear filters</p>
+        <a href="{% url 'event:browse_events' %}" class="mt-2 py-4 px-8 inline-block bg-yellow-500 text-lg rounded-xl text-white">Clear</a>
+    </div>
+
+    <!-- Events listing -->
+    <div class="col-span-3">
+        <div class="grid grid-cols-3 gap-3">
+            {% for event in events %}
+            <div class="overflow-hidden rounded-xl shadow-md">
+                <a href="{% url 'event:detail' event.id %}">
+                    <div class="w-full h-48">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="object-cover w-full h-full rounded-t-xl" alt="{{ event.name }}">
+                        {% else %}
+                        <img src="{% static 'images/default_image.jpeg' %}" class="object-contain w-full h-full rounded-t-xl bg-gray-100" alt="Default Event Image">
+                        {% endif %}
+                    </div>
+                    <div class="p-4 bg-white rounded-b-xl">
+                        <h2 class="text-lg font-semibold">{{ event.name }}</h2>
+                        <p class="text-gray-500">Price: {{ event.price }}</p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-500">No events found matching your search criteria.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

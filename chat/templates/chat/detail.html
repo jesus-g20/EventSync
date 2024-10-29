@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block content %}
+<h1 class="mb-6 text-3xl">{{ chat.event.name }}</h1>
+
+<div class="space-y-6">
+    {% for message in chat.messages.all %}
+    <div class="p-4 bg-gray-100 rounded-xl">
+        <p><strong>{{ message.created_by.username }}</strong> at {{ message.created_at }}</p>
+        <p>{{ message.content }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<form method="post" action=".">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="mt-6 py-4 px-8 text-lg bg-teal-500 hover:bg-teal-700 rounded-xl text-white">Send</button>
+</form>
+{% endblock %}
