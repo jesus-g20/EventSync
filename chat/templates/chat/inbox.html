@@ -5,21 +5,14 @@
 {% block content %}
 <h1 class="mb-6 text-3xl">Inbox</h1>
 
-<div class="space-y-6">
+<div class="space-y-4">
     {% for conversation in chats %}
-    <a href="{% url 'chat:detail' conversation.id %}">
-        <div class="p-6 flex bg-sky-100 rounded-xl">
-            <div class="pr-6">
-                <img src="{{ conversation.event.image.url }}" class="w-20 h-20 rounded-xl" alt="{{ conversation.event.name }}">
-            </div>
-
+    <a href="{% url 'chat:detail' conversation.id %}" class="block p-4 bg-sky-100 hover:bg-sky-200 rounded-xl">
+        <div class="flex items-center space-x-4">
+            <img src="{{ conversation.event.image.url }}" class="w-16 h-16 rounded-full" alt="{{ conversation.event.name }}">
             <div>
-                {% for member in conversation.members.all %}
-                {% if member != request.user %}
-                <p class="mb-4"><strong>{{ member.username }}</strong> | {{ conversation.modified_at }}</p>
-                <p>{{ conversation.event.name }}</p>
-                {% endif %}
-                {% endfor %}
+                <p><strong>{{ conversation.event.name }}</strong></p>
+                <p class="text-gray-500 text-sm">{{ conversation.modified_at }}</p>
             </div>
         </div>
     </a>

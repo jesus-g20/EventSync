@@ -24,11 +24,10 @@ class EventDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["related_events"] = Event.objects.filter(
             category=self.object.category, is_sold=False
-        ).exclude(pk=self.object.pk)[:3]
+        ).exclude(pk=self.object.pk)
         return context
 
 
-# ListView for browsing events
 class EventListView(ListView):
     model = Event
     template_name = "event/events.html"
@@ -37,11 +36,17 @@ class EventListView(ListView):
     def get_queryset(self):
         queryset = Event.objects.filter(is_sold=False)
         query = self.request.GET.get("query", "")
-        category_id = self.request.GET.get("category", 0)
+        selected_category_ids = self.request.GET.getlist("category")
 
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
+        # Display all events if no filter criteria are set
+        if not query and not selected_category_ids:
+            return queryset
 
+        # Filter events by categories if selected
+        if selected_category_ids:
+            queryset = queryset.filter(category_id__in=selected_category_ids)
+
+        # Filter by search query if provided
         if query:
             queryset = queryset.filter(
                 Q(name__icontains=query) | Q(description__icontains=query)
@@ -53,7 +58,7 @@ class EventListView(ListView):
         context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
         context["query"] = self.request.GET.get("query", "")
-        context["category_id"] = int(self.request.GET.get("category", 0))
+        context["selected_category_ids"] = self.request.GET.getlist("category")
         return context
 
 

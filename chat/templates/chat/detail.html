@@ -3,20 +3,27 @@
 {% block title %}Conversation{% endblock %}
 
 {% block content %}
-<h1 class="mb-6 text-3xl">{{ chat.event.name }}</h1>
+<div class="container mx-auto max-w-8xl px-4 py-6 bg-sky-50 rounded-lg shadow-md">
+    <h1 class="mb-6 text-3xl text-center">{{ chat.event.name }}</h1>
 
-<div class="space-y-6">
-    {% for message in chat.messages.all %}
-    <div class="p-4 bg-gray-100 rounded-xl">
-        <p><strong>{{ message.created_by.username }}</strong> at {{ message.created_at }}</p>
-        <p>{{ message.content }}</p>
+    <div class="space-y-4 mb-24"> <!-- Adjusted bottom margin to fit type bar above footer -->
+        {% for message in chat.messages.all %}
+        <div class="{% if message.created_by == request.user %}text-right{% else %}text-left{% endif %}">
+            <div class="inline-block p-4 rounded-xl max-w-xl shadow-md break-words {% if message.created_by == request.user %}bg-blue-200{% else %}bg-gray-100{% endif %}">
+                <p><strong>{{ message.created_by.username }}</strong> at {{ message.created_at }}</p>
+                <p>{{ message.content }}</p>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-<form method="post" action=".">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="mt-6 py-4 px-8 text-lg bg-teal-500 hover:bg-teal-700 rounded-xl text-white">Send</button>
-</form>
+    <!-- Type bar positioned above the footer -->
+    <form method="post" action="." class="bottom-20 left-0 right-0 max-w-6xl mx-auto p-4 bg-white border-t shadow-md rounded-xl">
+        {% csrf_token %}
+        <div class="flex items-center space-x-2">
+            <textarea name="content" rows="1" class="flex-grow p-2 border rounded-l-lg focus:outline-none" placeholder="Type your message..."></textarea>
+            <button class="px-4 py-2 bg-teal-500 hover:bg-teal-700 text-white rounded-r-lg">Send</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

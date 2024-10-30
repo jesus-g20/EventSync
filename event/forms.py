@@ -27,8 +27,9 @@ class NewEventForm(forms.ModelForm):
 class EditEventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ("name", "description", "price", "image", "is_sold")
+        fields = ("category", "name", "description", "price", "image", "is_sold") # Add 'category' here
         widgets = {
+            "category": forms.Select(attrs={"class": INPUT_CLASSES}),  # Add widget for 'category'
             "name": forms.TextInput(attrs={"class": INPUT_CLASSES}),
             "description": forms.Textarea(attrs={"class": INPUT_CLASSES}),
             "price": forms.TextInput(attrs={"class": INPUT_CLASSES}),
