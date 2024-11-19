@@ -26,4 +26,63 @@
         </div>
     </form>
 </div>
+
+<script>
+    // Use the chat ID as the room name for WebSocket
+    const roomName = "{{ chat.id }}";
+    const chatSocket = new WebSocket(
+        `ws://${window.location.host}/ws/chat/${roomName}/`
+    );
+
+    // To Handle WebSocket connection 
+    chatSocket.onopen = function(e) {
+        console.log('WebSocket connection opened:', e);
+    };
+
+    // Handle incoming WebSocket messages
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const chatLog = document.querySelector('.space-y-4.mb-24');  // Chat messages container
+
+        // Create a new message element and add it to the chat log
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add(data.username === "{{ request.user.username }}" ? "text-right" : "text-left");
+
+        messageDiv.innerHTML = `
+            <div class="inline-block p-4 rounded-xl max-w-xl shadow-md break-words ${
+                data.username === "{{ request.user.username }}" ? "bg-blue-200" : "bg-gray-100"
+            }">
+                <p><strong>${data.username}</strong> at ${data.created_at}</p>
+                <p>${data.message}</p>
+            </div>
+        `;
+        chatLog.appendChild(messageDiv);
+        chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+    };
+
+    // WebSocket connection closed out of nowhere
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly:', e);
+    };
+
+    // Send message to WebSocket when form is submitted
+    document.querySelector('form').onsubmit = function(e) {
+        e.preventDefault();  // Prevent the form from reloading the page
+        const messageInputDom = document.querySelector('textarea[name="content"]');
+        const message = messageInputDom.value;
+
+        // Only send if WebSocket connection is open
+        if (chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': "{{ request.user.username }}"
+            }));
+        } else {
+            console.error("WebSocket is not open. Ready state:", chatSocket.readyState);
+        }
+
+        messageInputDom.value = '';  // Clear the input field after sending
+    };
+</script>
+
 {% endblock %}
