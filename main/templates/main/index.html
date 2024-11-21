@@ -6,19 +6,20 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="relative text-center bg-sky-600 text-white h-[calc(70vh-100px)]">
-    <!-- Background Image -->
     <img src="{% static 'images/party.jpg' %}" alt="Party Event" class="absolute top-0 left-0 w-full h-full object-cover object-center opacity-50 z-0">
-
-    <!-- Content on Top of the Image -->
     <div class="relative z-10 flex flex-col items-center justify-center h-full">
         <h1 class="text-5xl font-bold mb-4">Discover & Create Events With Ease</h1>
+        {% if user.is_authenticated %}
+        <p class="text-lg mb-6">Welcome back, {{ user.username }}! Ready to discover or manage events?</p>
+        <div class="flex space-x-4">
+            <a href="{% url 'event:browse_events' %}" class=" bg-white font-bold text-sky-600 px-8 py-3 rounded-md shadow-md hover:bg-sky-100">Browse Events</a>
+        </div>
+        {% else %}
         <p class="text-lg mb-6">Find local events, connect with people, or host your own in just a few clicks.</p>
-
-        <!-- Button -->
-
         <div class="flex space-x-4">
             <a href="{% url 'main:registration' %}" class=" bg-white font-bold text-sky-600 px-8 py-3 rounded-md shadow-md hover:bg-sky-100">Join Now</a>
         </div>
+        {% endif %}
     </div>
 </section>
 
