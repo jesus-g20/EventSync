@@ -12,20 +12,23 @@
     <!-- Navigation -->
     <nav class="py-6 px-7 flex justify-between items-center bg-sky-600 shadow-xl">
         <a href="/" class="text-2xl font-bold text-sky-50">EventSync</a>
-        <div>
+        <div class="flex items-center">
             {% if request.user.is_authenticated %}
             <!-- Show these links for authenticated users -->
             <a href="{% url 'event:create_event' %}" class="text-white hover:text-sky-300 font-bold mx-4">Create Event</a>
             <a href="{% url 'event:browse_events' %}" class="text-white hover:text-sky-300 font-bold mx-4">Browse Events</a>
             <a href="{% url 'portal:index' %}" class="text-white hover:text-sky-300 font-bold mx-4">Portal</a>
             <a href="{% url 'chat:inbox' %}" class="text-white hover:text-sky-300 font-bold mx-4">Inbox</a>
+
+            <!-- Cart Button -->
+            <a href="{% url 'cart:view_cart' %}" class="bg-green-500 text-white px-8 py-3 font-bold rounded-lg mx-4 hover:bg-green-600">Cart</a>
+
             <a href="{% url 'main:logout' %}" class="bg-white text-sky-600 px-8 py-3 font-bold hover:bg-sky-100 rounded-lg">Logout</a>
             {% else %}
             <!-- Show these links for unauthenticated users -->
             <a href="{% url 'event:browse_events' %}" class="text-white hover:text-sky-300 font-bold mx-4">Browse Events</a>
             <a href="{% url 'main:login' %}" class="bg-white text-sky-600 px-8 py-3 font-bold hover:bg-sky-100 rounded-lg">Login</a>
             {% endif %}
-
         </div>
     </nav>
 
