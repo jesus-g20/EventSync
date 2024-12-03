@@ -14,6 +14,9 @@ class NewEventForm(forms.ModelForm):
             "description",
             "price",
             "image",
+            "location",
+            "event_date",
+            "event_time",
         )
         widgets = {
             "category": forms.Select(attrs={"class": INPUT_CLASSES}),
@@ -21,17 +24,41 @@ class NewEventForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"class": INPUT_CLASSES}),
             "price": forms.TextInput(attrs={"class": INPUT_CLASSES}),
             "image": forms.FileInput(attrs={"class": INPUT_CLASSES}),
+            "location": forms.TextInput(attrs={"class": INPUT_CLASSES}),
+            "event_date": forms.DateInput(
+                attrs={"type": "date", "class": INPUT_CLASSES}
+            ),
+            "event_time": forms.TimeInput(
+                attrs={"type": "time", "class": INPUT_CLASSES}
+            ),
         }
 
 
 class EditEventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ("category", "name", "description", "price", "image", "is_sold") # Add 'category' here
+        fields = (
+            "category",
+            "name",
+            "description",
+            "price",
+            "image",
+            "location",  # Added 'location'
+            "event_date",  # Added 'event_date'
+            "event_time",  # Added 'event_time'
+            "is_sold",
+        )
         widgets = {
-            "category": forms.Select(attrs={"class": INPUT_CLASSES}),  # Add widget for 'category'
+            "category": forms.Select(attrs={"class": INPUT_CLASSES}),
             "name": forms.TextInput(attrs={"class": INPUT_CLASSES}),
             "description": forms.Textarea(attrs={"class": INPUT_CLASSES}),
             "price": forms.TextInput(attrs={"class": INPUT_CLASSES}),
             "image": forms.FileInput(attrs={"class": INPUT_CLASSES}),
+            "location": forms.TextInput(attrs={"class": INPUT_CLASSES}),  # Added widget
+            "event_date": forms.DateInput(
+                attrs={"type": "date", "class": INPUT_CLASSES}
+            ),  # Added widget
+            "event_time": forms.TimeInput(
+                attrs={"type": "time", "class": INPUT_CLASSES}
+            ),  # Added widget
         }

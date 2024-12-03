@@ -3,12 +3,12 @@
 {% block title %}New Message{% endblock %}
 
 {% block content %}
-<h1 class="mb-6 text-3xl">New Message</h1>
+<h1 class="text-3xl px-6 py-8 text-center">New Message</h1>
 
-<form method="post" action=".">
+<form method="post" action="." class="px-6"> <!-- Added padding on both sides -->
     {% csrf_token %}
 
-    <div class="space-y-4">
+    <div class="space-y-4 bg-white p-6 rounded-xl shadow-lg"> <!-- Added spacing and styling -->
         {{ form.as_p }}
     </div>
 

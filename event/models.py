@@ -14,17 +14,16 @@ class Category(models.Model):
 
 
 class Event(models.Model):
-    category = models.ForeignKey(
-        Category, related_name="events", on_delete=models.CASCADE
-    )
+    category = models.ForeignKey(Category, related_name="events", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     price = models.FloatField()
     image = models.ImageField(upload_to="events_images", blank=True, null=True)
+    location = models.CharField(max_length=255)
+    event_date = models.DateField()
+    event_time = models.TimeField(blank=True, null=True)
     is_sold = models.BooleanField(default=False)
-    created_by = models.ForeignKey(
-        User, related_name="events", on_delete=models.CASCADE
-    )
+    created_by = models.ForeignKey(User, related_name="events", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

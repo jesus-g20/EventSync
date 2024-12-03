@@ -21,7 +21,9 @@
             <a href="{% url 'chat:inbox' %}" class="text-white hover:text-sky-300 font-bold mx-4">Inbox</a>
 
             <!-- Cart Button -->
-            <a href="{% url 'cart:view_cart' %}" class="bg-green-500 text-white px-8 py-3 font-bold rounded-lg mx-4 hover:bg-green-600">Cart</a>
+            <a href="{% url 'cart:view_cart' %}" class="bg-green-500 text-white px-8 py-3 font-bold rounded-lg mx-4 hover:bg-green-600">
+                Cart (<span id="cart-item-count">{{ cart_item_count }}</span>)
+            </a>
 
             <a href="{% url 'main:logout' %}" class="bg-white text-sky-600 px-8 py-3 font-bold hover:bg-sky-100 rounded-lg">Logout</a>
             {% else %}

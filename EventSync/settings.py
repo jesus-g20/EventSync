@@ -62,6 +62,12 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+# Session settings
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_NAME = "eventsync_sessionid"  # Optional: Custom cookie name
+SESSION_COOKIE_AGE = 3600  # Sessions last for 1 hour
+SESSION_SAVE_EVERY_REQUEST = True  # Save session to the database on every request
+
 ROOT_URLCONF = "EventSync.urls"
 
 TEMPLATES = [

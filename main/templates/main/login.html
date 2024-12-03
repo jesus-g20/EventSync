@@ -3,33 +3,41 @@
 {% block title %}Log in{% endblock %}
 
 {% block content %}
-<div class="w-1/2 my-6 mx-auto p-6 bg-gray-100 rounded-xl">
-    <h1 class="mb-6 text-3xl">Log in</h1>
+<div class="flex justify-center items-start pt-16">
+    <div class="w-full max-w-md p-6 bg-white shadow-lg rounded-xl">
+        <h1 class="text-3xl font-semibold text-center mb-6">Log in</h1>
 
-    <form method="post" action=".">
-        {% csrf_token %}
+        <form method="post" action=".">
+            {% csrf_token %}
 
-        <div class="mb-3">
-            <label class="inline-block mb-2">Username</label><br>
-            {{ form.username }}
-        </div>
+            <div class="space-y-4">
+                <div>
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
 
-        <div class="mb-3">
-            <label class="inline-block mb-2">Password</label><br>
-            {{ form.password }}
-        </div>
+                <div>
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+            </div>
 
-        {% if form.errors or form.non_field_errors %}
-        <div class="mb-3 p-6 bg-red-100 rounded-xl">
-            {% for field in form %}
-            {{ field.errors }}
-            {% endfor %}
+            {% if form.errors %}
+            <div class="my-4 p-4 bg-red-100 text-red-600 rounded-xl">
+                {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
 
-            {{ form.non_field_errors }}
-        </div>
-        {% endif %}
-
-        <button class="py-4 px-8 text-lg bg-teal-500 hover:bg-teal-700 rounded-xl text-white">Submit</button>
-    </form>
+            <button class="mt-6 w-full py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-700">
+                Submit
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -9,12 +10,10 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
 )
-
 from .forms import NewEventForm, EditEventForm
 from .models import Category, Event
 
 
-# DetailView for viewing an event's detail
 class EventDetailView(DetailView):
     model = Event
     template_name = "event/detail.html"
@@ -25,6 +24,8 @@ class EventDetailView(DetailView):
         context["related_events"] = Event.objects.filter(
             category=self.object.category, is_sold=False
         ).exclude(pk=self.object.pk)
+        # Add cart item count to context
+        context["cart_item_count"] = len(self.request.session.get("cart", []))
         return context
 
 
@@ -38,15 +39,12 @@ class EventListView(ListView):
         query = self.request.GET.get("query", "")
         selected_category_ids = self.request.GET.getlist("category")
 
-        # Display all events if no filter criteria are set
         if not query and not selected_category_ids:
             return queryset
 
-        # Filter events by categories if selected
         if selected_category_ids:
             queryset = queryset.filter(category_id__in=selected_category_ids)
 
-        # Filter by search query if provided
         if query:
             queryset = queryset.filter(
                 Q(name__icontains=query) | Q(description__icontains=query)
@@ -59,10 +57,11 @@ class EventListView(ListView):
         context["categories"] = Category.objects.all()
         context["query"] = self.request.GET.get("query", "")
         context["selected_category_ids"] = self.request.GET.getlist("category")
+        # Add cart item count to context
+        context["cart_item_count"] = len(self.request.session.get("cart", []))
         return context
 
 
-# CreateView for creating a new event
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
     form_class = NewEventForm
@@ -77,11 +76,10 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "New item"
+        context["title"] = "New Event"
         return context
 
 
-# UpdateView for editing an event
 class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Event
     form_class = EditEventForm
@@ -96,11 +94,10 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Edit item"
+        context["title"] = "Edit Event"
         return context
 
 
-# DeleteView for deleting an event
 class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Event
     template_name = "event/confirm_delete.html"
@@ -109,3 +106,16 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         event = self.get_object()
         return self.request.user == event.created_by
+
+
+# New view to handle adding items to the cart and returning updated cart count
+def add_to_cart(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    cart = request.session.get("cart", [])
+    if event_id not in cart:
+        cart.append(event_id)
+        request.session["cart"] = cart
+        request.session.modified = True
+
+    # Return the updated cart count as JSON
+    return JsonResponse({"cart_count": len(cart)})
