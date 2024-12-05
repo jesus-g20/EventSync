@@ -23,10 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
-
+STRIPE_SECRET_KEY = "sk_test_51QMvSNFTb1kffye6YcvAoBQheXb6v2c7Bed2xpbrGo4X5su57w5xfmaHsiRcL7luAF4rhYfWtlOeBEwOcPfmuBH500wGOc8tGy"
+STRIPE_PUBLISHABLE_KEY = "pk_test_51QMvSNFTb1kffye6V9G0qCT5Yuzo6ALK6Q6jPxZdSz4JLKBN2OeFwoBmwXP2AljVFWDIOLOvf9wL7Tih8pcfCeId00JfXzPkn7"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = []
 
 LOGIN_URL = "/login/"

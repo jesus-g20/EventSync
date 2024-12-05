@@ -38,9 +38,10 @@
             <span>Total:</span>
             <span>${{ total_with_tax|floatformat:2 }}</span>
         </p>
-        <a href="#" class="bg-sky-600 text-white px-6 py-3 rounded-lg text-center font-bold mt-4 block">
-            Checkout
-        </a>
+        <a href="{% url 'cart:checkout' %}" 
+        class="bg-sky-600 text-white px-6 py-3 rounded-lg text-center font-bold mt-4 block hover:bg-sky-700">
+         Checkout
+     </a>
     </div>
     {% else %}
     <div class="flex items-center justify-center h-64">
