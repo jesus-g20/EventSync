@@ -1,8 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Q
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.db.models import Q, Sum
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from cart.models import Cart, CartItem
 from django.views.generic import (
     DetailView,
     ListView,
@@ -24,8 +25,6 @@ class EventDetailView(DetailView):
         context["related_events"] = Event.objects.filter(
             category=self.object.category, is_sold=False
         ).exclude(pk=self.object.pk)
-        # Add cart item count to context
-        context["cart_item_count"] = len(self.request.session.get("cart", []))
         return context
 
 
@@ -38,9 +37,6 @@ class EventListView(ListView):
         queryset = Event.objects.filter(is_sold=False)
         query = self.request.GET.get("query", "")
         selected_category_ids = self.request.GET.getlist("category")
-
-        if not query and not selected_category_ids:
-            return queryset
 
         if selected_category_ids:
             queryset = queryset.filter(category_id__in=selected_category_ids)
@@ -57,8 +53,6 @@ class EventListView(ListView):
         context["categories"] = Category.objects.all()
         context["query"] = self.request.GET.get("query", "")
         context["selected_category_ids"] = self.request.GET.getlist("category")
-        # Add cart item count to context
-        context["cart_item_count"] = len(self.request.session.get("cart", []))
         return context
 
 
@@ -108,14 +102,24 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == event.created_by
 
 
-# New view to handle adding items to the cart and returning updated cart count
+@login_required
 def add_to_cart(request, event_id):
-    event = get_object_or_404(Event, pk=event_id)
-    cart = request.session.get("cart", [])
-    if event_id not in cart:
-        cart.append(event_id)
-        request.session["cart"] = cart
-        request.session.modified = True
+    """
+    Adds an event to the user's cart and redirects to the previous page.
+    """
+    # Fetch or create the cart for the current user
+    cart, _ = Cart.objects.get_or_create(user=request.user)
 
-    # Return the updated cart count as JSON
-    return JsonResponse({"cart_count": len(cart)})
+    # Fetch or create the cart item
+    event = get_object_or_404(Event, pk=event_id)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, event=event)
+
+    if not created:
+        cart_item.quantity += 1  # Increment quantity if it already exists
+        cart_item.save()
+
+    # Calculate total quantity of items in the cart
+    total_quantity = cart.items.aggregate(total=Sum("quantity"))["total"] or 0
+
+    # Redirect back to the previous page
+    return redirect(request.META.get("HTTP_REFERER", "event:browse_events"))

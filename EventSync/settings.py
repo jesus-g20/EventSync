@@ -59,11 +59,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 # Session settings
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 SESSION_COOKIE_NAME = "eventsync_sessionid"  # Optional: Custom cookie name
 SESSION_COOKIE_AGE = 3600  # Sessions last for 1 hour
 SESSION_SAVE_EVERY_REQUEST = True  # Save session to the database on every request
@@ -81,6 +82,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "main.context_processors.cart_item_count",
             ],
         },
     },

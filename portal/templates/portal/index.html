@@ -21,7 +21,6 @@
                     {% endif %}
                 </div>
 
-
                 <div class="p-4">
                     <h2 class="text-xl font-semibold">{{ event.name }}</h2>
                     <p class="text-sky-600">Price: {{ event.price }}</p>
@@ -29,6 +28,17 @@
             </a>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- Wallet Balance Section -->
+    <div class="mt-10">
+        <h2 class="text-3xl px-6 py-8 text-center">Wallet Balance</h2>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="text-lg font-semibold text-gray-700 flex justify-between">
+                <span>Total Balance:</span>
+                <span>${{ total_balance|floatformat:2 }}</span>
+            </p>
+        </div>
     </div>
 </div>
 {% endblock %}

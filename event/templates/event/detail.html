@@ -12,9 +12,7 @@
             <div class="flex justify-end p-2 space-x-2 absolute top-0 right-0">
                 {% if request.user == event.created_by %}
                 <a href="{% url 'event:edit_event' event.pk %}" class="px-4 py-2 text-lg font-semibold bg-sky-600 text-white rounded-lg">Edit</a>
-                <button 
-                    id="delete-btn" 
-                    class="px-4 py-2 text-lg font-semibold bg-red-500 text-white rounded-lg">
+                <button id="delete-btn" class="px-4 py-2 text-lg font-semibold bg-red-500 text-white rounded-lg">
                     Delete
                 </button>
                 {% endif %}
@@ -54,9 +52,11 @@
             </a>
 
             <!-- Add to Cart Button -->
-            <form method="post" action="{% url 'cart:add_to_cart' event.pk %}">
+            <form method="post" action="{% url 'event:add_to_cart' event.pk %}">
                 {% csrf_token %}
-                <button type="submit" class="px-6 py-3 text-lg font-semibold bg-green-500 text-white rounded-xl hover:bg-green-600">Add to Cart</button>
+                <button type="submit" class="px-6 py-3 text-lg font-semibold bg-green-500 text-white rounded-xl hover:bg-green-600">
+                    Add to Cart
+                </button>
             </form>
         </div>
         {% endif %}
