@@ -100,26 +100,3 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         event = self.get_object()
         return self.request.user == event.created_by
-
-
-@login_required
-def add_to_cart(request, event_id):
-    """
-    Adds an event to the user's cart and redirects to the previous page.
-    """
-    # Fetch or create the cart for the current user
-    cart, _ = Cart.objects.get_or_create(user=request.user)
-
-    # Fetch or create the cart item
-    event = get_object_or_404(Event, pk=event_id)
-    cart_item, created = CartItem.objects.get_or_create(cart=cart, event=event)
-
-    if not created:
-        cart_item.quantity += 1  # Increment quantity if it already exists
-        cart_item.save()
-
-    # Calculate total quantity of items in the cart
-    total_quantity = cart.items.aggregate(total=Sum("quantity"))["total"] or 0
-
-    # Redirect back to the previous page
-    return redirect(request.META.get("HTTP_REFERER", "event:browse_events"))

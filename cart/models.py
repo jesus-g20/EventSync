@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from event.models import Event
-from django.db import transaction
+from event.models import Wallet
 
 
 class Cart(models.Model):
@@ -37,25 +36,48 @@ class Cart(models.Model):
         return round(self.total_cost + self.tax_amount, 2)
 
     def confirm_payment(self):
-        """Set the payment status to confirmed and update wallet balance."""
+        """Set the payment status to confirmed, update wallet balance, and remove cart items."""
         self.payment_status = "confirmed"
         self.active = False  # Deactivate the cart after payment
         self.save()
 
-        # Update the organizer's wallet balance
+        # Update the organizer's wallet balance for each event item
+        from event.models import Wallet  # Import dynamically to avoid circular import
+
         for item in self.items.all():
             organizer = item.event.created_by  # Get the event organizer
             organizer_wallet, created = Wallet.objects.get_or_create(user=organizer)
-            organizer_wallet.balance += item.total_price  # Add the item's total price
+            organizer_wallet.balance += (
+                item.total_price
+            )  # Add the total price to balance
             organizer_wallet.save()
 
-    def __str__(self):
-        return f"Cart for {self.user.username}"
+        # Debugging: Print items in the cart before deletion
+        print(f"Cart {self.id} has {self.items.count()} items before deletion.")
+
+        # Explicitly delete items with error handling
+        deleted_items_count = 0
+        try:
+            for item in self.items.all():
+                item.delete()
+                deleted_items_count += 1
+        except Exception as e:
+            print(f"Error deleting items: {e}")
+            # You can log this error to the database or external service if needed
+
+        # Debugging: Log how many items were deleted
+        print(f"Deleted {deleted_items_count} items from Cart {self.id}.")
+
+        # Ensure that cart is now empty (optional)
+        if self.items.count() == 0:
+            print(f"Cart {self.id} is now empty.")
+        else:
+            print(f"Cart {self.id} still has {self.items.count()} items.")
 
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name="items", on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey("event.Event", on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
     @property

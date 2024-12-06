@@ -7,24 +7,18 @@ class Wallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     balance = models.FloatField(default=0.0)
 
+    def add_balance(self, amount):
+        """Add to the user's wallet balance."""
+        self.balance += amount
+        self.save()
+
     def __str__(self):
         return f"{self.user.username}'s Wallet"
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        ordering = ("name",)
-        verbose_name_plural = "Categories"
-
-    def __str__(self):
-        return self.name
-
-
 class Event(models.Model):
     category = models.ForeignKey(
-        Category, related_name="events", on_delete=models.CASCADE
+        "Category", related_name="events", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -51,7 +45,18 @@ class Event(models.Model):
             .aggregate(total_revenue=Sum("quantity") * self.price)
             .get("total_revenue", 0)
         )
-        return revenue or 0  # Return 0 if no transactions exist
+        return revenue or 0
+
+    def __str__(self):
+        return self.name
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name_plural = "Categories"
 
     def __str__(self):
         return self.name
