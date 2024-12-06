@@ -6,7 +6,8 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL, -- Store hashed passwords securely
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	delete_requested BOOLEAN DEFAULT FALSE
 );
 
 -- Trigger for auto-updating updated_at
