@@ -1,0 +1,73 @@
+{% extends 'main/base.html' %}
+{% block title %}Checkout{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto my-10">
+    <h1 class="text-2xl font-bold mb-6">Complete Your Payment</h1>
+    <div class="bg-sky-100 p-6 rounded-lg shadow-md w-2/3 mx-auto">
+        <p class="text-lg font-semibold text-sky-700 mb-4">
+            Total Amount to Pay: ${{ total_with_tax|floatformat:2 }}
+        </p>
+        <form id="payment-form">
+            <div id="payment-element" class="mb-6"></div>
+            <button id="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg w-full font-bold hover:bg-blue-700">
+                Pay Now
+            </button>
+            <div id="error-message" class="text-red-500 mt-4"></div>
+        </form>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ publishable_key|escapejs }}');
+    console.log("Stripe Publishable Key:", '{{ publishable_key|escapejs }}'); // Debugging key
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            // Fetch the client_secret from the backend
+            const response = await fetch("{% url 'cart:create_payment_intent' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({}),
+            });
+
+            const data = await response.json();
+            const clientSecret = data.client_secret;
+
+            if (!clientSecret) {
+                throw new Error("No client_secret received from server.");
+            }
+
+            // Initialize Stripe Elements with the client_secret
+            const elements = stripe.elements({ clientSecret });
+            const paymentElement = elements.create("payment");
+            paymentElement.mount("#payment-element");
+
+            // Handle form submission
+            const form = document.getElementById("payment-form");
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const { error } = await stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        return_url: "http://127.0.0.1:8000/cart/thank-you/", // Full valid URL for redirection
+                    },
+                });
+
+                if (error) {
+                    console.error("Payment error:", error);
+                    document.getElementById("error-message").textContent = error.message;
+                }
+            });
+        } catch (error) {
+            console.error("Error initializing payment:", error);
+            document.getElementById("error-message").textContent =
+                "An error occurred while processing your payment. Please try again.";
+        }
+    });
+</script>
+{% endblock content %}

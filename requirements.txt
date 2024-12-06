@@ -6,3 +6,4 @@ python-decouple
 whitenoise==6.4.0
 daphne==4.0.0
 channels==4.0.0
+stripe

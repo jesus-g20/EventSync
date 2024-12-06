@@ -1,9 +1,14 @@
 from django.shortcuts import get_object_or_404, render, redirect
+from django.conf import settings  # Import settings
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from event.models import Event
 from .models import Cart, CartItem
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 @login_required
@@ -62,3 +67,70 @@ def delete_from_cart(request, cart_item_id):
 
     # Redirect back to the cart page
     return redirect("cart:view_cart")
+
+
+@login_required
+def checkout(request):
+    cart = Cart.objects.filter(user=request.user).first()
+    if not cart or cart.total_with_tax == 0:
+        messages.error(request, "Your cart is empty.")
+        return redirect("cart:view_cart")
+
+    # Debugging
+    print(
+        f"Checkout - User: {request.user}, Authenticated: {request.user.is_authenticated}"
+    )
+    print(f"Session Key (Checkout): {request.session.session_key}")
+
+    request.session.modified = True  # Persist session explicitly
+
+    return render(
+        request,
+        "cart/checkout.html",
+        {
+            "publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
+            "total_with_tax": cart.total_with_tax,
+        },
+    )
+
+
+@login_required
+@csrf_exempt
+def create_payment_intent(request):
+    """
+    Creates a payment intent for Stripe.
+    """
+    if request.method == "POST":
+        try:
+            # Fetch the user's cart
+            cart = Cart.objects.filter(user=request.user).first()
+            if not cart or cart.total_with_tax == 0:
+                return JsonResponse({"error": "Cart is empty."}, status=400)
+
+            # Create a PaymentIntent
+            intent = stripe.PaymentIntent.create(
+                amount=int(cart.total_with_tax * 100),  # Convert total to cents
+                currency="usd",
+                automatic_payment_methods={"enabled": True},
+            )
+
+            return JsonResponse({"client_secret": intent.client_secret})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=403)
+
+
+@login_required
+def thank_you(request):
+    # Retrieve the user's active cart
+    cart = Cart.objects.filter(user=request.user, active=True).first()
+    if cart:
+        # Update the cart's payment status
+        cart.payment_status = "confirmed"
+        cart.active = False  # Close the cart after successful payment
+        cart.save()
+
+        # Debugging
+        print(f"Cart {cart.id} payment confirmed for user {request.user}")
+
+    request.session.modified = True  # Persist session explicitly
+    return render(request, "cart/thank_you.html")

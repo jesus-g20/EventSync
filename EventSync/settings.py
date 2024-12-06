@@ -23,9 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
+STRIPE_SECRET_KEY = "sk_test_51QMvSNFTb1kffye6YcvAoBQheXb6v2c7Bed2xpbrGo4X5su57w5xfmaHsiRcL7luAF4rhYfWtlOeBEwOcPfmuBH500wGOc8tGy"
+STRIPE_PUBLISHABLE_KEY = "pk_test_51QMvSNFTb1kffye6V9G0qCT5Yuzo6ALK6Q6jPxZdSz4JLKBN2OeFwoBmwXP2AljVFWDIOLOvf9wL7Tih8pcfCeId00JfXzPkn7"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -53,21 +56,23 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",  # Must be before AuthenticationMiddleware
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",  # Handles login sessions
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
-# Session settings
+# Ensure SESSION_COOKIE_SECURE is False for development (HTTP)
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-
-SESSION_COOKIE_NAME = "eventsync_sessionid"  # Optional: Custom cookie name
-SESSION_COOKIE_AGE = 3600  # Sessions last for 1 hour
-SESSION_SAVE_EVERY_REQUEST = True  # Save session to the database on every request
+SESSION_COOKIE_NAME = "eventsync_sessionid"
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SECURE = False  # Use True only if HTTPS is enabled
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = "EventSync.urls"
 

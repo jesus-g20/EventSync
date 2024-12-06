@@ -3,6 +3,14 @@ from django.db import models
 from django.db.models import Sum
 
 
+class Wallet(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    balance = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"{self.user.username}'s Wallet"
+
+
 class Category(models.Model):
     name = models.CharField(max_length=255)
 
@@ -33,17 +41,17 @@ class Event(models.Model):
 
     def calculate_revenue(self):
         """
-        Calculate the total revenue for this event from ticket sales.
+        Calculate the total revenue for this event from all paid cart items.
         """
-        from cart.models import CartItem  # Import CartItem model dynamically
+        from cart.models import CartItem  # Import dynamically to avoid circular import
 
+        # Sum up the revenue from all paid cart items for this event
         revenue = (
-            CartItem.objects.filter(event=self).aggregate(
-                total_revenue=Sum("quantity") * self.price
-            )["total_revenue"]
-            or 0
+            CartItem.objects.filter(event=self, cart__payment_status="confirmed")
+            .aggregate(total_revenue=Sum("quantity") * self.price)
+            .get("total_revenue", 0)
         )
-        return revenue
+        return revenue or 0  # Return 0 if no transactions exist
 
     def __str__(self):
         return self.name

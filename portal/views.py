@@ -1,6 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
-from django.db.models import Sum
 from event.models import Event
 
 
@@ -15,10 +14,17 @@ class PortalIndexView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Get all events created by the current user
-        my_events = self.get_queryset()
-        # Calculate total wallet balance
+        user = self.request.user
+        my_events = Event.objects.filter(created_by=user)
+
+        # Debugging
+        print(f"Calculating total balance for user: {user}")
+
+        # Calculate the total revenue by summing up all event revenues
         total_balance = sum(event.calculate_revenue() for event in my_events)
-        # Add balance to context
+
+        # Debugging
+        print(f"Total Balance: {total_balance}")
+
         context["total_balance"] = total_balance
         return context
