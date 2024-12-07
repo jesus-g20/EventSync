@@ -1,6 +1,8 @@
 from django.db.models import Sum
 from cart.models import Cart
 
+# fix big
+
 
 def cart_item_count(request):
     """
